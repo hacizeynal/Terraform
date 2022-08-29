@@ -95,10 +95,6 @@ data "aws_ami" "latest-amazon-linux-image" {
     }
 }
 
-# output "ec2_public_ip" {
-#     value = aws_instance.myapp-server.public_ip
-# }
-
 resource "aws_key_pair" "ssh_key" {
   key_name = "ssh-key"
   public_key = file(var.my_public_key_location)
@@ -118,16 +114,16 @@ resource "aws_instance" "myapp-server" {
   tags = {
     "Name" = "${var.env_prefix}-server"
   }
-  user_data = <<-EOF
+  # user_data = <<-EOF
 
-    #!/bin/bash
-    sudo yum update -y && sudo yum install -y docker
-    sudo systemctl start docker
-    sudo systemctl restart docker.socket
-    sudo usermod -aG docker ec2-user
-    docker run -p 8080:80 nginx
+  #   #!/bin/bash
+  #   sudo yum update -y && sudo yum install -y docker
+  #   sudo systemctl start docker
+  #   sudo systemctl restart docker.socket
+  #   sudo usermod -aG docker ec2-user
+  #   docker run -p 8080:80 nginx
 
-               EOF
+  #              EOF
 }
 # user_data =file("entry-script")
 
