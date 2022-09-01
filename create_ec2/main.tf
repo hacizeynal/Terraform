@@ -9,9 +9,9 @@ variable "availibility_zone" {}
 variable "env_prefix" {}
 variable "my_source_ip" {}
 variable "instance_type" {}
-variable "my_public_key_location" {
-  
-}
+variable "my_public_key_location" {}
+variable "ssh_private_key" {}
+variable "user_name" {}
 
 resource "aws_vpc" "my_app_vpc" {
   cidr_block = var.vpc_cidr_block
@@ -114,18 +114,17 @@ resource "aws_instance" "myapp-server" {
   tags = {
     "Name" = "${var.env_prefix}-server"
   }
-  # user_data = <<-EOF
+  # user_data =file("entry-script")
 
-  #   #!/bin/bash
-  #   sudo yum update -y && sudo yum install -y docker
-  #   sudo systemctl start docker
-  #   sudo systemctl restart docker.socket
-  #   sudo usermod -aG docker ec2-user
-  #   docker run -p 8080:80 nginx
 
-  #              EOF
+  ## provisioner will be used to execute playbook locally by Terraform
+  provisioner "local-exec" {
+    working_dir = "/Users/zhajili/Desktop/DevOps/Ansible"
+    command = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_private_key} --user ${var.user_name} deploy-docker-to-aws_linux.yaml"
+  }
+
 }
-# user_data =file("entry-script")
+
 
 output "ec2_public_ip" {
     value = aws_instance.myapp-server.public_ip
